@@ -1,13 +1,15 @@
-import 'package:bulk_sms_app/models/getcontacts.dart';
+import 'package:bulk_sms_app/feature/widgets/request_contact.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 
 class ContactProvider with ChangeNotifier {
   List<Contact> _contacts = [];
   List<Contact> _results = [];
+  final List<String> _select = [];
 
   List<Contact> get contacts => _contacts;
   List<Contact> get results => _results;
+  List<String> get select => _select;
 
   Future<void> loadContacts() async {
     requestContactPermission().then((_) async {
@@ -15,6 +17,11 @@ class ContactProvider with ChangeNotifier {
       _results = _contacts;
       notifyListeners();
     });
+  }
+
+  void clearSelection() {
+    _select.clear();
+    notifyListeners();
   }
 
   void searchContacts(String search) {

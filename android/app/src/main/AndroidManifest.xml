@@ -4,6 +4,8 @@
     <!-- Gerekli izinler -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />  
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />  
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />      
 
     <application
         android:label="bulk_sms_app"
