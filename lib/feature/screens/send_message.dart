@@ -1,5 +1,5 @@
 import 'package:bulk_sms_app/feature/screens/view_message.dart';
-import 'package:bulk_sms_app/feature/widgets/background_colors.dart';
+import 'package:bulk_sms_app/feature/widgets/colors.dart';
 import 'package:bulk_sms_app/services/provider/contact_provider.dart';
 import 'package:bulk_sms_app/feature/screens/access_contact.dart';
 import 'package:bulk_sms_app/feature/widgets/sort_and_sent.dart';

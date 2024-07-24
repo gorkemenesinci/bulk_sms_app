@@ -1,4 +1,4 @@
-import 'package:bulk_sms_app/feature/widgets/background_colors.dart';
+import 'package:bulk_sms_app/feature/widgets/colors.dart';
 import 'package:bulk_sms_app/services/provider/contact_provider.dart';
 import 'package:bulk_sms_app/feature/widgets/contact_select.dart';
 import 'package:flutter/material.dart';
