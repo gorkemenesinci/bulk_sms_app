@@ -1,9 +1,10 @@
 import 'dart:convert';
-
+import 'package:bulk_sms_app/feature/widgets/background_colors.dart';
 import 'package:bulk_sms_app/services/provider/contact_provider.dart';
 import 'package:bulk_sms_app/services/provider/message_provider.dart';
 import 'package:bulk_sms_app/feature/screens/view_message.dart';
 import 'package:bulk_sms_app/models/message_model.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +28,88 @@ class SortAndSent extends StatefulWidget {
 }
 
 class _SortAndSentState extends State<SortAndSent> {
+  BackgroundColors colors = BackgroundColors();
+
+  @override
+  Widget build(BuildContext context) {
+    final contactProvider = Provider.of<ContactProvider>(context);
+    var select = contactProvider.select;
+    return Scaffold(
+      backgroundColor: colors.backgroundColor,
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Expanded(
+            child: GridView.builder(
+              itemCount: contactProvider.select.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+              ),
+              itemBuilder: (context, index) {
+                return InkWell(
+                  onTap: () {
+                    setState(() {
+                      _showDeleteConfirmationDialog(context, index);
+                    });
+                  },
+                  child: Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.green[100],
+                    ),
+                    margin: const EdgeInsets.all(5),
+                    child: Text(
+                      select[index],
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          SizedBox(
+            height: widget.screenHeight * 0.10,
+            child: TextFormField(
+              controller: widget._messageController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  gapPadding: 8,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                labelText: "Send Message",
+                labelStyle: Theme.of(context)
+                    .textTheme
+                    .bodyLarge!
+                    .copyWith(color: Colors.black),
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    String message = widget._messageController.text;
+
+                    if (message.isNotEmpty) {
+                      sendBulkSms(select, message);
+                      showToast("Send is Successfuly", colors.trueSend);
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const SendMessageView(),
+                      ));
+                      widget._messageController.clear();
+                    } else {
+                      showToast("Message Cannot Be Empty", colors.falseSend);
+                    }
+                  },
+                  icon: const Icon(
+                    Icons.send,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void sendBulkSms(List<String> phoneNumbers, String message) async {
     const String apiKey = 'd6936c33';
     const String apiSecret = 'LyZAP3pfpJi3NpNP';
@@ -50,68 +133,62 @@ class _SortAndSentState extends State<SortAndSent> {
       if (response.statusCode == 200) {
         final messageProvider =
             Provider.of<MessageProvider>(context, listen: false);
+
         messageProvider.addMessage(Message(
-            phoneNumber: phoneNumber,
-            content: message,
-            timestamp: DateTime.now()));
-        print('SMS sent to $phoneNumber');
+          phoneNumber: phoneNumber,
+          content: message,
+          timestamp: DateTime.now(),
+        ));
       } else {
-        print('Failed to send SMS to $phoneNumber');
+        showToast("ERROR", colors.falseSend);
       }
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final contactProvider = Provider.of<ContactProvider>(context);
-    var select = contactProvider.select;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Expanded(
-          child: GridView.builder(
-            itemCount: contactProvider.select.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
-            ),
-            itemBuilder: (context, index) {
-              return Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: Colors.green[100]),
-                margin: const EdgeInsets.all(5),
-                child: Text(
-                  select[index],
-                  textAlign: TextAlign.center,
-                ),
-              );
-            },
+  void _showDeleteConfirmationDialog(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Do You Want To Remove The Name?"),
+          content: Text(
+            "Are You Sure?",
+            textAlign: TextAlign.center,
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge!
+                .copyWith(fontWeight: FontWeight.bold),
           ),
-        ),
-        SizedBox(
-          height: widget.screenHeight * 0.1,
-          child: TextFormField(
-            controller: widget._messageController,
-            decoration: InputDecoration(
-              labelText: "Send Message",
-              suffixIcon: IconButton(
-                onPressed: () {
-                  String message = widget._messageController.text;
-                  if (message.isNotEmpty) {
-                    sendBulkSms(select, message);
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const SendMessageView()));
-                  } else {
-                    print("Message Cannot Be Empty");
-                  }
-                },
-                icon: const Icon(Icons.send),
-              ),
+          actions: [
+            TextButton(
+              child: const Text("No"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             ),
-          ),
-        ),
-      ],
+            TextButton(
+              child: const Text("Yes"),
+              onPressed: () {
+                setState(() {
+                  widget.select.removeAt(index);
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
+  }
+
+  void showToast(String message, Color background) {
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: background,
+        textColor: Colors.black,
+        fontSize: 16);
   }
 }

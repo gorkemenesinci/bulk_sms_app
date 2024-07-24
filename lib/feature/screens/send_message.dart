@@ -1,3 +1,5 @@
+import 'package:bulk_sms_app/feature/screens/view_message.dart';
+import 'package:bulk_sms_app/feature/widgets/background_colors.dart';
 import 'package:bulk_sms_app/services/provider/contact_provider.dart';
 import 'package:bulk_sms_app/feature/screens/access_contact.dart';
 import 'package:bulk_sms_app/feature/widgets/sort_and_sent.dart';
@@ -13,6 +15,7 @@ class SendMessagePage extends StatefulWidget {
 
 class _SendMessagePageState extends State<SendMessagePage> {
   final TextEditingController _messageController = TextEditingController();
+  BackgroundColors colors = BackgroundColors();
 
   @override
   void dispose() {
@@ -27,14 +30,30 @@ class _SendMessagePageState extends State<SendMessagePage> {
     var select = contactProvider.select;
 
     return Scaffold(
+      backgroundColor: colors.backgroundColor,
       appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: colors.backgroundColor,
         actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const SendMessageView()));
+            },
+            icon: const Icon(
+              Icons.send,
+              color: Colors.black,
+            ),
+          ),
           IconButton(
             onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => const AccessContact()));
             },
-            icon: const Icon(Icons.add_circle),
+            icon: const Icon(
+              Icons.add_circle,
+              color: Colors.black,
+            ),
           ),
         ],
         title: Text(

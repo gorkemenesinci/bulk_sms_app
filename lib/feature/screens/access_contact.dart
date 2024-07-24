@@ -1,3 +1,4 @@
+import 'package:bulk_sms_app/feature/widgets/background_colors.dart';
 import 'package:bulk_sms_app/services/provider/contact_provider.dart';
 import 'package:bulk_sms_app/feature/widgets/contact_select.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ class AccessContact extends StatefulWidget {
 
 class _AccessContactState extends State<AccessContact> {
   final controller = TextEditingController();
+  BackgroundColors colors = BackgroundColors();
 
   @override
   void initState() {
@@ -33,11 +35,15 @@ class _AccessContactState extends State<AccessContact> {
     final contactProvider = Provider.of<ContactProvider>(context);
 
     return Scaffold(
+        backgroundColor: colors.backgroundColor,
         appBar: AppBar(
-          title: Text(
-            "Messages",
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
+          centerTitle: true,
+          backgroundColor: colors.backgroundColor,
+          title: Text("Messages",
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineMedium!
+                  .copyWith(color: colors.textColor)),
         ),
         body: ContactSelect(
             screenHeight: screenHeight,
